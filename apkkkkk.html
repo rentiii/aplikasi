@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TalentQuest - Tes Minat Bakat Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gold: #D4AF37;
+            --dark-royal: #1A1A2E;
+            --deep-purple: #16213E;
+            --accent-gold: #FFD700;
+            --glass: rgba(255, 255, 255, 0.1);
+            --text-light: #E0E0E0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+        body {
+            background: linear-gradient(135deg, var(--dark-royal), var(--deep-purple), #0F3460);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            text-align: center;
+            transition: all 0.5s ease;
+        }
+
+        /* Home Screen */
+        .home-screen h1 {
+            font-size: 2.5rem;
+            color: var(--primary-gold);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .home-screen p { margin-bottom: 30px; opacity: 0.8; }
+
+        /* Button Styling */
+        .btn {
+            background: linear-gradient(45deg, var(--primary-gold), var(--accent-gold));
+            color: var(--dark-royal);
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-transform: uppercase;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+        }
+
+        /* Quiz Styling */
+        .hidden { display: none; }
+        
+        .question-box { text-align: left; }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-gold);
+            width: 0%;
+            transition: width 0.4s;
+            border-radius: 10px;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .option-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 15px 20px;
+            border-radius: 12px;
+            color: white;
+            text-align: left;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .option-btn:hover {
+            background: rgba(212, 175, 55, 0.2);
+            border-color: var(--primary-gold);
+        }
+
+        /* Result Styling */
+        .result-card h2 { color: var(--primary-gold); margin-bottom: 20px; }
+        .result-type { font-size: 2rem; font-weight: 700; margin-bottom: 10px; color: #fff; }
+        .result-desc { line-height: 1.6; margin-bottom: 25px; }
+        
+        .career-tags {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .tag {
+            background: var(--primary-gold);
+            color: var(--dark-royal);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="app-container">
+        <div id="home-screen" class="home-screen">
+            <h1>TalentQuest</h1>
+            <p>Temukan potensi tersembunyi Anda melalui metode analisis minat bakat RIASEC yang akurat dan elegan.</p>
+            <button class="btn" onclick="startTest()">Mulai Analisis</button>
+        </div>
+
+        <div id="quiz-screen" class="hidden">
+            <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
+            <div class="question-box">
+                <p id="question-number" style="color: var(--primary-gold); font-weight: 600;"></p>
+                <h2 id="question-text" style="margin-top: 10px;"></h2>
+                <div class="options-container">
+                    <button class="option-btn" onclick="handleAnswer(3)">Sangat Tertarik / Sangat Sesuai</button>
+                    <button class="option-btn" onclick="handleAnswer(2)">Tertarik / Cukup Sesuai</button>
+                    <button class="option-btn" onclick="handleAnswer(1)">Kurang Tertarik / Kurang Sesuai</button>
+                    <button class="option-btn" onclick="handleAnswer(0)">Tidak Tertarik sama sekali</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="result-screen" class="hidden result-card">
+            <h2>Hasil Analisis Anda</h2>
+            <div class="result-type" id="result-type">Memuat...</div>
+            <p class="result-desc" id="result-desc"></p>
+            <div style="margin-bottom: 15px; font-weight: 600; color: var(--primary-gold);">Rekomendasi Karier:</div>
+            <div class="career-tags" id="career-tags"></div>
+            <br><br>
+            <button class="btn" onclick="location.reload()">Ulangi Tes</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "Memperbaiki peralatan elektronik atau mekanik.", type: "R" },
+            { q: "Melakukan penelitian ilmiah atau memecahkan masalah matematika rumit.", type: "I" },
+            { q: "Menulis puisi, melukis, atau bermain alat musik.", type: "A" },
+            { q: "Membantu orang lain menyelesaikan masalah pribadi mereka.", type: "S" },
+            { q: "Memimpin tim untuk mencapai target penjualan atau bisnis.", type: "E" },
+            { q: "Mengatur dokumen, data, dan sistem administrasi secara rapi.", type: "C" },
+            { q: "Bekerja di luar ruangan (outdoor) dan menggunakan fisik.", type: "R" },
+            { q: "Menganalisis data medis atau fenomena alam.", type: "I" },
+            { q: "Mendesain layout grafis atau dekorasi ruangan.", type: "A" },
+            { q: "Mengajar atau melatih orang lain tentang hal baru.", type: "S" }
+        ];
+
+        const resultsData = {
+            R: { title: "Realistic (Praktis)", desc: "Anda adalah orang yang menyukai aktivitas praktis, bekerja dengan alat, mesin, dan lebih suka bekerja di luar ruangan.", careers: ["Insinyur", "Mekanik", "Pilot", "Arsitek"] },
+            I: { title: "Investigative (Pemikir)", desc: "Anda sangat analitis, intelektual, dan memiliki rasa ingin tahu yang tinggi terhadap ilmu pengetahuan.", careers: ["Ilmuwan", "Programmer", "Dokter", "Analyst"] },
+            A: { title: "Artistic (Kreatif)", desc: "Anda memiliki jiwa seni yang tinggi, imajinatif, dan suka bekerja dalam lingkungan yang bebas tanpa aturan kaku.", careers: ["Desainer", "Penulis", "Musisi", "Editor Video"] },
+            S: { title: "Social (Penolong)", desc: "Anda senang membantu, merawat, dan berinteraksi dengan orang lain untuk memberikan dampak sosial.", careers: ["Psikolog", "Guru", "Perawat", "HRD"] },
+            E: { title: "Enterprising (Pebisnis)", desc: "Anda adalah pemimpin alami, persuasif, energik, dan suka mengambil risiko dalam bisnis.", careers: ["Pengusaha", "Manajer", "Marketing", "Politikus"] },
+            C: { title: "Conventional (Teratur)", desc: "Anda sangat teliti, menyukai keteraturan, data, dan bekerja dalam sistem yang terorganisir.", careers: ["Akuntan", "Data Entry", "Bankir", "Sekretaris"] }
+        };
+
+        let currentQuestion = 0;
+        let scores = { R: 0, I: 0, A: 0, S: 0, E: 0, C: 0 };
+
+        function startTest() {
+            document.getElementById('home-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('question-number').innerText = `Pertanyaan ${currentQuestion + 1} dari ${questions.length}`;
+            document.getElementById('question-text').innerText = q.q;
+            document.getElementById('progress-fill').style.width = `${((currentQuestion) / questions.length) * 100}%`;
+        }
+
+        function handleAnswer(points) {
+            const type = questions[currentQuestion].type;
+            scores[type] += points;
+            
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                showQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+
+            // Find max score
+            let maxType = 'R';
+            for (let type in scores) {
+                if (scores[type] > scores[maxType]) maxType = type;
+            }
+
+            const result = resultsData[maxType];
+            document.getElementById('result-type').innerText = result.title;
+            document.getElementById('result-desc').innerText = result.desc;
+            
+            const tagsContainer = document.getElementById('career-tags');
+            tagsContainer.innerHTML = '';
+            result.careers.forEach(career => {
+                const span = document.createElement('span');
+                span.className = 'tag';
+                span.innerText = career;
+                tagsContainer.appendChild(span);
+            });
+        }
+    </script>
+</body>
+</html>
